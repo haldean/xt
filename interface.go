@@ -24,4 +24,13 @@ func main() {
 	fmt.Printf("\n\nmove c0 by 5, 20")
 	w.Move(0, 40, 5)
 	w.Print(os.Stdout)
+
+	f, err := os.Create("/tmp/test")
+	if err != nil {
+		fmt.Printf("couldn't create file: %v\n", err)
+	}
+	err = w.Buf.Write(f)
+	if err != nil {
+		fmt.Printf("couldn't write file: %v\n", err)
+	}
 }

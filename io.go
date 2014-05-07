@@ -37,3 +37,13 @@ func NewBuffer(r io.Reader) (Buffer, error) {
 	}
 	return b, nil
 }
+
+func (b Buffer) Write(w io.Writer) error {
+	for _, l := range b.Lines {
+		_, err := w.Write([]byte(string(l)))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
