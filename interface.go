@@ -6,13 +6,13 @@ import (
 	"strings"
 )
 
-var test_data = `
+var sample = `
 this is the test data
 札幌でまたガ
   スボンベ爆発事件`
 
 func main() {
-	r := strings.NewReader(test_data)
+	r := strings.NewReader(sample)
 	buf, err := NewBuffer(r)
 	if err != nil {
 		fmt.Printf("couldn't read buffer: %v\n", err)

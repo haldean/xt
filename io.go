@@ -5,7 +5,7 @@ import (
 	"io"
 )
 
-const READ_BUFFER_SIZE = 16
+const READ_BUFFER_SIZE = 4096
 
 func NewBuffer(r io.Reader) (Buffer, error) {
 	var b Buffer
