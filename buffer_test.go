@@ -24,7 +24,7 @@ func runesEqual(r1 []rune, s string) bool {
 }
 
 func checkLineMatch(t *testing.T, l Line, s string) {
-	if !runesEqual([]rune(l), s + "\n") {
+	if !runesEqual([]rune(l), s+"\n") {
 		t.Errorf("line doesn't match: got %v, expected %v", l, []rune(s))
 	}
 }

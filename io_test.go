@@ -9,21 +9,21 @@ import (
 )
 
 type fakeLineReader struct {
-	i int
+	i   int
 	lim int
 }
 
 func (f *fakeLineReader) Read(p []byte) (n int, err error) {
-	if (f.i >= f.lim) {
+	if f.i >= f.lim {
 		return 0, io.EOF
 	}
 	max := len(p)
-	if f.i + max > f.lim {
+	if f.i+max > f.lim {
 		max = f.lim - f.i
 	}
 	x := 33 % len(p)
 	for i := 0; i < max; i++ {
-		if (i == x) {
+		if i == x {
 			p[i] = '\n'
 		} else {
 			p[i] = 'g'

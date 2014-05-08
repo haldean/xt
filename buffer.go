@@ -12,7 +12,7 @@ type Buffer struct {
 }
 
 type Cursor struct {
-	X, Y uint32
+	X, Y int32
 }
 
 type Window struct {
@@ -27,7 +27,7 @@ func (c *Cursor) FitToBuffer(b Buffer) {
 		return
 	}
 
-	ny := uint32(len(b.Lines))
+	ny := int32(len(b.Lines))
 	if c.Y < 0 {
 		c.Y = 0
 	}
@@ -35,7 +35,7 @@ func (c *Cursor) FitToBuffer(b Buffer) {
 		c.Y = ny - 1
 	}
 
-	nx := uint32(len(b.Lines[c.Y]))
+	nx := int32(len(b.Lines[c.Y]))
 	if c.X < 0 {
 		c.X = 0
 	}
@@ -44,7 +44,7 @@ func (c *Cursor) FitToBuffer(b Buffer) {
 	}
 }
 
-func (w Window) Move(c, dx, dy uint32) {
+func (w Window) Move(c uint8, dx, dy int32) {
 	w.Cursors[c].X += dx
 	w.Cursors[c].Y += dy
 	w.Cursors[c].FitToBuffer(w.Buf)
