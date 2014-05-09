@@ -107,6 +107,21 @@ func TestNewRope(t *testing.T) {
 	if a != str {
 		t.Errorf("new/assemble was lossy, got \"%s\", expected \"%s\"", a, str)
 	}
+}
 
-	r.Debug()
+func TestConcat(t *testing.T) {
+	str := "ana ng and I are getting old but we still haven't walked in the glow of each other's majestic presence"
+	r1 := NewRope("ana ng and I are getting old but we still haven't ")
+	r2 := NewRope("walked in the glow of each other's majestic presence")
+	r := Concat(r1, r2)
+	rlen := r.Length()
+	elen := r1.Length() + r2.Length()
+	if rlen != elen {
+		t.Errorf("result of concat has wrong length %d, expected %d",
+		rlen, elen)
+	}
+	a := r.Assemble()
+	if a != str {
+		t.Errorf("bad concat, got \"%s\", expected \"%s\"", a, str)
+	}
 }

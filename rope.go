@@ -156,6 +156,14 @@ func (r Rope) Find(c rune, start uint) int {
 	return find(r, c, start, 0)
 }
 
+func Concat(r1, r2 Rope) Rope {
+	var r Rope
+	r.Left = &r1
+	r.Right = &r2
+	r.Weight, r.WeightBytes = r.Left.totalSubtreeWeights()
+	return r
+}
+
 func (r Rope) debug(indent int) {
 	fmt.Printf("\n")
 	for i := 0; i < indent; i++ {
