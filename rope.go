@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"strings"
 	"unicode/utf8"
 )
@@ -15,6 +16,69 @@ type Rope struct {
 }
 
 var OutOfBounds error
+
+const BALANCE_STRING_MIN = 16
+const BALANCE_STRING_MAX = 64
+
+func NewRope(s string) Rope {
+	var r Rope
+	r.Data = s
+	r.rebalance()
+	r.recalcWeights()
+	return r
+}
+
+// make sure you recalculate weights after rebalancing!
+func (r *Rope) rebalance() {
+	if r.Left == nil && r.Right == nil {
+		if utf8.RuneCountInString(r.Data) > BALANCE_STRING_MAX {
+			c := len(r.Data) / 2
+			for !utf8.ValidString(r.Data[:c]) && c < len(r.Data) {
+				c += 1
+			}
+			var left, right Rope
+			left.Data = r.Data[:c]
+			right.Data = r.Data[c:]
+			r.Left = &left
+			r.Right = &right
+			r.Data = ""
+		}
+	}
+	if r.Left != nil {
+		r.Left.rebalance()
+	}
+	if r.Right != nil {
+		r.Right.rebalance()
+	}
+}
+
+// returns (rune weight, byte weight)
+func (r Rope) totalSubtreeWeights() (uint, uint) {
+	rw := r.Weight
+	bw := r.WeightBytes
+	if r.Right != nil {
+		rrw, rbw := r.Right.totalSubtreeWeights()
+		rw += rrw
+		bw += rbw
+	}
+	return rw, bw
+}
+
+func (r *Rope) recalcWeights() {
+	if r.Left != nil {
+		r.Left.recalcWeights()
+	}
+	if r.Right != nil {
+		r.Right.recalcWeights()
+	}
+	r.Weight = uint(utf8.RuneCountInString(r.Data))
+	r.WeightBytes = uint(len(r.Data))
+	if r.Left != nil {
+		rw, bw := r.Left.totalSubtreeWeights()
+		r.Weight += rw
+		r.WeightBytes += bw
+	}
+}
 
 func (r Rope) Length() uint {
 	l := r.Weight
@@ -30,34 +94,6 @@ func (r Rope) Bytes() uint {
 		l += r.Right.Bytes()
 	}
 	return l
-}
-
-// returns (rune weight, byte weight)
-func (r Rope) totalSubtreeWeights() (uint, uint) {
-	rw := r.Weight
-	bw := r.WeightBytes
-	if r.Right != nil {
-		rrw, rbw := r.Right.totalSubtreeWeights()
-		rw += rrw
-		bw += rbw
-	}
-	return rw, bw
-}
-
-func (r *Rope) CalcWeights() {
-	if r.Left != nil {
-		r.Left.CalcWeights()
-	}
-	if r.Right != nil {
-		r.Right.CalcWeights()
-	}
-	r.Weight = uint(utf8.RuneCountInString(r.Data))
-	r.WeightBytes = uint(len(r.Data))
-	if r.Left != nil {
-		rw, bw := r.Left.totalSubtreeWeights()
-		r.Weight += rw
-		r.WeightBytes += bw
-	}
 }
 
 func (r Rope) Assemble() string {
@@ -101,7 +137,7 @@ func find(r Rope, c rune, start uint, offset uint) int {
 		} else {
 			i := strings.IndexRune(r.Data[start:], c)
 			if i != -1 {
-				return i + int(offset)
+				return i + int(offset) + int(start)
 			}
 		}
 	}
@@ -118,4 +154,28 @@ func find(r Rope, c rune, start uint, offset uint) int {
 
 func (r Rope) Find(c rune, start uint) int {
 	return find(r, c, start, 0)
+}
+
+func (r Rope) debug(indent int) {
+	fmt.Printf("\n")
+	for i := 0; i < indent; i++ {
+		fmt.Printf("  ")
+	}
+	fmt.Printf("rope runes=%d bytes=%d data=\"%s\"",
+		r.Weight, r.WeightBytes, string(r.Data))
+	if r.Left != nil {
+		r.Left.debug(indent + 1)
+	} else {
+		fmt.Printf(" no-left")
+	}
+	if r.Right != nil {
+		r.Right.debug(indent + 1)
+	} else {
+		fmt.Printf(" no-right")
+	}
+}
+
+func (r Rope) Debug() {
+	r.debug(0)
+	fmt.Println()
 }

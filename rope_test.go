@@ -15,7 +15,7 @@ func makeTestRope() Rope {
 	r5.Data = "will die and I'll get "
 	// these chinese characters take 3 bytes each
 	r3.Data = "the money 世界"
-	r.CalcWeights()
+	r.recalcWeights()
 
 	return r
 }
@@ -89,4 +89,24 @@ func TestFind(t *testing.T) {
 	checkFind(r, 's', 1, -1)
 	checkFind(r, 'i', 10, 16)
 	checkFind(r, 'i', 17, 21)
+}
+
+func TestNewRope(t *testing.T) {
+	str := `
+	why is the world in love again.
+	why are we marching hand in hand.
+	why are the ocean levels rising up.
+	it's a brand new record
+	for nineteen ninety
+	they might be giants
+	brand new album
+	floooooooooooood`
+
+	r := NewRope(str)
+	a := r.Assemble()
+	if a != str {
+		t.Errorf("new/assemble was lossy, got \"%s\", expected \"%s\"", a, str)
+	}
+
+	r.Debug()
 }
